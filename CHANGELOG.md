@@ -1,4 +1,8 @@
 # Changelog
+## 0.8.0
+
+- **Feature**: Grafana Query Assistant v1 (GRAP-88)
+
 ## 0.7.0
 
 - **Feature**: Support externally shared dashboards (GRAP-39)
