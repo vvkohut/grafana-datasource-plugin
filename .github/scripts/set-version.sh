@@ -2,6 +2,7 @@
 set -euo pipefail
 
 GITHUB_HEAD_REF="${GITHUB_HEAD_REF:-}"
+GITHUB_REF_NAME="${GITHUB_REF_NAME:-}"
 
 PACKAGE_FILE="package.json"
 VERSION=$(grep '"version"' "$PACKAGE_FILE" | head -1 | sed -E 's/.*"version": *"([^"]+)".*/\1/')
@@ -11,6 +12,9 @@ IS_HOTFIX_SOURCE_BRANCH=false
 
 [[ "$GITHUB_HEAD_REF" =~ ^release[/_-].+ ]] && IS_RELEASE_SOURCE_BRANCH=true
 [[ "$GITHUB_HEAD_REF" =~ ^hotfix[/_-].+ ]] && IS_HOTFIX_SOURCE_BRANCH=true
+
+[[ "$GITHUB_REF_NAME" =~ ^release[/_-].+ ]] && IS_RELEASE_SOURCE_BRANCH=true
+[[ "$GITHUB_REF_NAME" =~ ^hotfix[/_-].+ ]] && IS_HOTFIX_SOURCE_BRANCH=true
 
 if $IS_RELEASE_SOURCE_BRANCH || $IS_HOTFIX_SOURCE_BRANCH; then
   if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
