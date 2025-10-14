@@ -56,6 +56,7 @@ export class DataSource extends DataSourceWithBackend<
   private readonly beautifier = new ErrorMessageBeautifier();
   public options: DataQueryRequest<HdxQuery> | undefined;
   public filters: AdHocVariableFilter[] | undefined;
+  public errors: { [refId: string]: string | undefined } = {};
 
   public readonly aiAssistantConfig?: AssistantConfig;
 
@@ -129,6 +130,13 @@ export class DataSource extends DataSourceWithBackend<
           })
           .pipe(
             map((response: DataQueryResponse) => {
+              this.errors =
+                response.errors?.reduce((acc, e) => {
+                  if (e.refId) {
+                    acc[e.refId] = e.message;
+                  }
+                  return acc;
+                }, {} as { [refId: string]: string | undefined }) ?? {};
               const errors = response.errors?.map((error: DataQueryError) => {
                 console.error(error);
                 logError(

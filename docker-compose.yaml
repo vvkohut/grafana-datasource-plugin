@@ -3,12 +3,20 @@ x-common-variables: &common-variables
   CLUSTER_NODE: demo.trafficpeak.live
   REDIS_USERNAME: chproxy
   REDIS_PASSWORD:
-  HYDROLIX_USERNAME:
-  HYDROLIX_PASSWORD:
+  HYDROLIX_USERNAME: vkohut+dev@hydrolix.io
+  HYDROLIX_PASSWORD: DevTest83
   GF_INSTALL_PLUGINS: "grafana-clickhouse-datasource 4.8.2"
 volumes:
   prometheus_data: {}
 services:
+  ariadna:
+    image: ariadne-core:latest
+    container_name: ariadne
+    ports:
+      - 8080:8080/tcp
+    volumes:
+      - ./ariadne-config.yaml:/config/ariadne-config.yaml
+    command: ariadne-core --config /config/ariadne-config.yaml
   grafana:
     extends:
       file: .config/docker-compose-base.yaml

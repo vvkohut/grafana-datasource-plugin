@@ -1,8 +1,4 @@
-import {
-  BackendSrvRequest,
-  FetchError,
-  FetchResponse,
-} from "@grafana/runtime";
+import { BackendSrvRequest, FetchError, FetchResponse } from "@grafana/runtime";
 
 export type BackendSrvFetch = (
   path: string,
@@ -33,15 +29,15 @@ export class UserAbortError extends AssistantApiError {}
 export class NoSuchThreadFoundError extends AssistantApiError {}
 
 export class AssistantClient {
-  constructor(private readonly fetch: BackendSrvFetch) {
-  }
+  constructor(private readonly fetch: BackendSrvFetch) {}
 
   public addThread = async (
     query: string,
+    error: string | undefined,
     signal: AbortSignal
   ): Promise<Thread> => {
     return await this.withAbort(
-      this.request<Thread>(`threads`, JSON.stringify({ query }), "POST"),
+      this.request<Thread>(`threads`, JSON.stringify({ query, error }), "POST"),
       signal
     );
   };
@@ -50,13 +46,14 @@ export class AssistantClient {
     threadId: string,
     message: string,
     query: string,
+    error: string | undefined,
     signal: AbortSignal
   ): Promise<Message> => {
     try {
       return await this.withAbort(
         this.request<Message>(
           `threads/${threadId}/messages`,
-          JSON.stringify({ thread_id: threadId, message, query }),
+          JSON.stringify({ thread_id: threadId, message, query, error }),
           "POST"
         ),
         signal
@@ -64,11 +61,14 @@ export class AssistantClient {
     } catch (error) {
       if (error instanceof ApiRequestError) {
         const response = error.cause as FetchError<{ detail: string }>;
-        if (response.status === 404 && response.data?.detail === "Thread not found") {
-          throw new NoSuchThreadFoundError()
+        if (
+          response.status === 404 &&
+          response.data?.detail === "Thread not found"
+        ) {
+          throw new NoSuchThreadFoundError();
         }
       }
-      throw error
+      throw error;
     }
   };
 
@@ -79,7 +79,7 @@ export class AssistantClient {
     headers?: Record<string, any>
   ): Promise<T> {
     try {
-       const response = await this.fetch.call(undefined, path, data, {
+      const response = await this.fetch.call(undefined, path, data, {
         responseType: "json",
         method: method,
         showErrorAlert: false,
@@ -88,23 +88,23 @@ export class AssistantClient {
           ...headers,
         },
       });
-       return response.data
+      return response.data;
     } catch (error) {
       if (error instanceof Error) {
-        throw error
+        throw error;
       }
       return this.handleError(error as FetchError);
     }
   }
 
   private handleError<T>(error: FetchError): T {
-    let message = "Unknown error"
+    let message = "Unknown error";
     if (typeof error.data === "string") {
-      message = error.data
+      message = error.data;
     } else if (error.data?.detail) {
-      message = error.data.detail
+      message = error.data.detail;
     }
-    throw new ApiRequestError(message, error)
+    throw new ApiRequestError(message, error);
   }
 
   private withAbort<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
