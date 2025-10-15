@@ -12,6 +12,7 @@ import { AssistantWelcome } from "./AssistantWelcome";
 
 export interface AssistantPanelProps {
   query: string;
+  error?: string;
   onApplyQuery: (query: string) => void;
   onClose: () => void;
 }
@@ -19,6 +20,7 @@ export interface AssistantPanelProps {
 export function AssistantPanel({
   query,
   onApplyQuery,
+  error,
   onClose,
 }: AssistantPanelProps) {
   const assistant = useAssistantConversation();
@@ -35,9 +37,8 @@ export function AssistantPanel({
       inputRef.current?.focus();
     });
   }, []);
-
-  const onSend = (message: string, includeQuery = false) =>
-    assistant.addMessage(message, query);
+  const onSend = (message: string) =>
+    assistant.addMessage(message, query, error);
 
   const onReset = async () => {
     await assistant.reset();
@@ -77,9 +78,7 @@ export function AssistantPanel({
     >
       <div className={styles.contentContainer}>
         {showWelcomePage ? (
-          <AssistantWelcome
-            onSend={(message: string) => onSend(message, true)}
-          />
+          <AssistantWelcome onSend={(message: string) => onSend(message)} />
         ) : (
           <AssistantThread
             className={styles.thread}

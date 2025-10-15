@@ -1,7 +1,11 @@
 import { createStore } from "zustand";
 import { v4 as uuid } from "uuid";
 import { BackendSrvRequest, FetchResponse } from "@grafana/runtime";
-import { AssistantClient, UserAbortError, NoSuchThreadFoundError } from "./assistantClient";
+import {
+  AssistantClient,
+  UserAbortError,
+  NoSuchThreadFoundError,
+} from "./assistantClient";
 
 export interface AssistantMessage {
   id: string;
@@ -124,7 +128,11 @@ export class AssistantConversation {
     return this.stateStore.getState();
   }
 
-  async addMessage(message: string, query: string): Promise<void> {
+  async addMessage(
+    message: string,
+    query: string,
+    error?: string
+  ): Promise<void> {
     //avoid sending message twice
     if (this.state().thinking) {
       return;
@@ -151,12 +159,17 @@ export class AssistantConversation {
     this.state().addMessage(answerMessage);
 
     try {
-      let threadId = await this.getOrAddThreadId(query, this.abortController.signal);
+      let threadId = await this.getOrAddThreadId(
+        query,
+        error,
+        this.abortController.signal
+      );
 
       const answer = await this.client.addMessage(
         threadId,
         message,
         query,
+        error,
         this.abortController.signal
       );
 
@@ -181,9 +194,13 @@ export class AssistantConversation {
           status: "failed",
         }));
         if (e instanceof NoSuchThreadFoundError) {
-          this.state().setErrorMessage("Conversation unavailable, reset it to continue");
+          this.state().setErrorMessage(
+            "Conversation unavailable, reset it to continue"
+          );
         } else {
-          this.state().setErrorMessage(e instanceof Error ? e.message : String(e));
+          this.state().setErrorMessage(
+            e instanceof Error ? e.message : String(e)
+          );
         }
         throw e;
       }
@@ -193,10 +210,16 @@ export class AssistantConversation {
     }
   }
 
-  private async getOrAddThreadId(query: string, signal: AbortSignal) {
+  private async getOrAddThreadId(
+    query: string,
+    error: string | undefined,
+    signal: AbortSignal
+  ) {
     let threadId = this.state().getThreadId();
     if (threadId === null || threadId === "") {
-      threadId = await this.client.addThread(query, signal).then(t => t.thread_id)
+      threadId = await this.client
+        .addThread(query, error, signal)
+        .then((t) => t.thread_id);
       this.state().setThreadId(threadId);
     }
     return threadId;

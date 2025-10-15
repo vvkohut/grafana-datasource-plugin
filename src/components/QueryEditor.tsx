@@ -284,6 +284,7 @@ export function QueryEditor(props: Props) {
           {showAiAssistant && (
             <AssistantPanel
               query={props.query.rawSql ?? ""}
+              error={props.datasource.errors[props.query.refId]}
               onClose={() => setShowAiAssistant(false)}
               onApplyQuery={onApplyQuery}
             />
