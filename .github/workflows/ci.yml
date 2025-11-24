@@ -247,7 +247,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-frontend, build-backend]
     outputs:
-      PLUGIN_VERSION: ${{ steps.package.outputs.PLUGIN_VERSION }}
+      PLUGIN_VERSION: ${{ steps.create.outputs.PLUGIN_VERSION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -280,6 +280,7 @@ jobs:
           GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
 
       - name: Create package
+        id: create
         run: |
           PLUGIN_NAME=$(npm pkg get name | tr -d '"')
           PLUGIN_VERSION=$(npm pkg get version | tr -d '"')
