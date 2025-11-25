@@ -344,10 +344,6 @@ jobs:
           echo "$changelog" >> "$GITHUB_OUTPUT"
           echo 'EOF' >> "$GITHUB_OUTPUT"
         shell: bash
-      - name: Display steps as JSON
-        run: |
-          echo "${{ toJSON(steps) }}"
-
       - name: Create tag
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         # Allow the tag creation to fail, in case it already exists
@@ -373,4 +369,4 @@ jobs:
           files: |
             /tmp/plugin-package/*.zip
           fail_on_unmatched_files: true
-          body: ${{ needs.package.outputs.version }}
+          body: ${{ steps.parse.outputs.changelog }}
