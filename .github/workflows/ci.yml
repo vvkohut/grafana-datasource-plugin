@@ -329,37 +329,35 @@ jobs:
       - name: Display all outputs as JSON
         run: |
           echo "${{ toJSON(github) }}"
-#      - name: Download GitHub artifact
-#        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
-#        with:
-#          name: plugin-package
-#          path: /tmp/plugin-package
-#
-#      - name: Create tag
-#        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
-#        # Allow the tag creation to fail, in case it already exists
-#        # (e.g.: created manually, or re-triggering a release).
-#        continue-on-error: true
-#        with:
-#          script: |
-#            const { PLUGIN_VERSION } = process.env
-#            github.rest.git.createRef({
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              ref: `refs/tags/v${PLUGIN_VERSION}`,
-#              sha: context.sha
-#            })
-#        env:
-#          PLUGIN_VERSION: ${{ fromJSON(needs.package.outputs).version }}
-#
-#      - name: Create Github release
-#        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
-#        with:
-#          draft: ${{ inputs.github-draft-release }}
-#          name: ${{ fromJSON(needs.ci.outputs.plugin).id }} v${{ fromJSON(needs.ci.outputs.plugin).version }}
-#          tag_name: v${{ fromJSON(needs.ci.outputs.plugin).version }}
-#          files: |
-#            /tmp/plugin-package/*.zip
-#            /tmp/plugin-package/*.zip.sha1
-#          fail_on_unmatched_files: true
-#          body: ${{ steps.changelog.outputs.changelog }}
+      - name: Download GitHub artifact
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: plugin-package
+          path: /tmp/plugin-package
+
+      - name: Create tag
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        # Allow the tag creation to fail, in case it already exists
+        # (e.g.: created manually, or re-triggering a release).
+        continue-on-error: true
+        with:
+          script: |
+            const { PLUGIN_VERSION } = process.env
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/v${PLUGIN_VERSION}`,
+              sha: context.sha
+            })
+        env:
+          PLUGIN_VERSION: ${{ needs.package.outputs.version }}
+
+      - name: Create Github release
+        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
+        with:
+          name: hydrolix-hydrolix-datasource v${{ needs.package.outputs.version }}
+          tag_name: v${{ needs.package.outputs.version }}
+          files: |
+            /tmp/plugin-package/*.zip
+          fail_on_unmatched_files: true
+          body: ${{ needs.package.outputs.version }}
