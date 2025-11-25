@@ -334,6 +334,17 @@ jobs:
         with:
           name: plugin-package
           path: /tmp/plugin-package
+      - name: Parse changelog
+        id: parse
+        run: |
+          changelog=`.github/scripts/parse-changelog.sh CHANGELOG.md`
+          echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$changelog" >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+        shell: bash
+      - name: Display steps as JSON
+        run: |
+          echo "${{ toJSON(steps) }}"
 
       - name: Create tag
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
@@ -355,7 +366,7 @@ jobs:
       - name: Create Github release
         uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
         with:
-          name: hydrolix-hydrolix-datasource v${{ needs.package.outputs.version }}
+          name: ${{ needs.package.outputs.version }}
           tag_name: v${{ needs.package.outputs.version }}
           files: |
             /tmp/plugin-package/*.zip
