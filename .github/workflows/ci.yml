@@ -328,8 +328,7 @@ jobs:
     steps:
       - name: Display all outputs as JSON
         run: |
-          echo Version "${{ needs.package.outputs.version }}"
-          echo github "${{ fromJSON(github) }}"
+          echo "${{ toJSON(github) }}"
 #      - name: Download GitHub artifact
 #        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
 #        with:
