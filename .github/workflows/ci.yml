@@ -327,6 +327,9 @@ jobs:
       - name: RUN RELEASE ?
         run: |
           echo "${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}"
+      - name: IS DRAFT ?
+        run: |
+          echo "${{ contains(needs.package.outputs.version, 'dev') }}"
   create-github-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
@@ -372,7 +375,7 @@ jobs:
       - name: Create Github release
         uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
         with:
-          draft: contains('needs.package.outputs.version', 'dev')
+          draft: ${{ contains(needs.package.outputs.version, 'dev') }}
           name: ${{ needs.package.outputs.version }}
           tag_name: v${{ needs.package.outputs.version }}
           files: |
