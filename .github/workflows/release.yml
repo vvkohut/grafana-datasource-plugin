@@ -2,6 +2,11 @@ name: GitHub Release
 
 on:
   workflow_call:
+    inputs:
+      version:
+        description: "plugin version to release"
+        required: true
+        type: string
 
 jobs:
   create-github-release:
@@ -41,14 +46,14 @@ jobs:
               sha: context.sha
             })
         env:
-          PLUGIN_VERSION: ${{ needs.package.outputs.version }}
+          PLUGIN_VERSION: ${{ inputs.version }}
 
       - name: Create Github release
         uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
         with:
-          draft: ${{ contains(needs.package.outputs.version, 'dev') }}
-          name: ${{ needs.package.outputs.version }}
-          tag_name: v${{ needs.package.outputs.version }}
+          draft: ${{ contains(inputs.version, 'dev') }}
+          name: ${{ inputs.version }}
+          tag_name: v${{ inputs.version }}
           files: |
             /tmp/plugin-package/*.zip
           fail_on_unmatched_files: true

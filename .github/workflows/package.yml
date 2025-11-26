@@ -51,7 +51,7 @@ jobs:
         run: npx --yes @grafana/sign-plugin@latest
         if: false
         env:
-          GRAFANA_ACCESS_POLICY_TOKEN: ${{ inputs.grafana_token }}
+          GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.grafana_token }}
 
       - name: Create package
         id: create
