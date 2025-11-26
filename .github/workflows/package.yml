@@ -1,7 +1,20 @@
-name: S3 Publish
+name: Packege
 
 on:
   workflow_call:
+    inputs:
+      node_version:
+        description: "Node.js version to use"
+        required: true
+        type: string
+    secrets:
+      grafana_token:
+        description: "Grafana access policy token for signing"
+        required: true
+    outputs:
+      version:
+        description: "Plugin version"
+        value: ${{ jobs.package.outputs.version }}
 
 jobs:
   package:
@@ -16,7 +29,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ inputs.node_version }}
           cache: 'npm'
 
       - name: Download frontend artifacts
@@ -38,7 +51,7 @@ jobs:
         run: npx --yes @grafana/sign-plugin@latest
         if: false
         env:
-          GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
+          GRAFANA_ACCESS_POLICY_TOKEN: ${{ inputs.grafana_token }}
 
       - name: Create package
         id: create
