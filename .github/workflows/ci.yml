@@ -321,8 +321,7 @@ jobs:
   log:
     name: LOG
     runs-on: ubuntu-latest
-    needs:
-      - package
+    needs: [e2e]
     steps:
       - name: Display all outputs as JSON
         run: |
