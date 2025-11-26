@@ -243,81 +243,17 @@ jobs:
           flags: backend
   package:
     name: Package Plugin
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/package.yml
     needs: [build-frontend, build-backend]
-    outputs:
-      version: ${{ steps.create.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Download frontend artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: dist/
-
-      - name: Download backend artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-dist
-          path: dist/
-
-      - name: Set version
-        run: ./.github/scripts/set-version.sh
-
-      - name: Sign plugin
-        run: npx --yes @grafana/sign-plugin@latest
-        if: false
-        env:
-          GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
-
-      - name: Create package
-        id: create
-        run: |
-          PLUGIN_NAME=$(npm pkg get name | tr -d '"')
-          PLUGIN_VERSION=$(npm pkg get version | tr -d '"')
-          echo "version=$PLUGIN_VERSION" >> $GITHUB_OUTPUT
-          ZIP_NAME=$PLUGIN_NAME-$PLUGIN_VERSION.zip
-          chmod 0775 dist/gpx_*
-          mv dist/ $PLUGIN_NAME/
-          zip $ZIP_NAME $PLUGIN_NAME -r
-
-      - name: Upload package
-        uses: actions/upload-artifact@v4
-        with:
-          name: plugin-package
-          path: "*.zip"
-          retention-days: 7
   e2e:
     name: E2E Tests
     uses: ./.github/workflows/e2e.yml
     needs: [package]
   publish-aws:
     name: Publish to AWS S3
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/s3_publish.yml
     if: inputs.publish_to_aws
     needs: [package]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: plugin-package
-
-      - name: Publish to S3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: ./.github/scripts/publish-aws.sh
   log:
     name: LOG
     runs-on: ubuntu-latest
@@ -334,52 +270,6 @@ jobs:
           echo "${{ contains(needs.package.outputs.version, 'dev') }}"
   create-github-release:
     name: Create GitHub Release
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/release.yml
     needs: [e2e]
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
-    steps:
-      - name: Display all outputs as JSON
-        run: |
-          echo "${{ toJSON(github) }}"
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Download GitHub artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: plugin-package
-          path: /tmp/plugin-package
-      - name: Parse changelog
-        id: parse
-        run: |
-          changelog=`.github/scripts/parse-changelog.sh CHANGELOG.md`
-          echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
-          echo "$changelog" >> "$GITHUB_OUTPUT"
-          echo 'EOF' >> "$GITHUB_OUTPUT"
-        shell: bash
-      - name: Create tag
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        # Allow the tag creation to fail, in case it already exists
-        # (e.g.: created manually, or re-triggering a release).
-        continue-on-error: true
-        with:
-          script: |
-            const { PLUGIN_VERSION } = process.env
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/tags/v${PLUGIN_VERSION}`,
-              sha: context.sha
-            })
-        env:
-          PLUGIN_VERSION: ${{ needs.package.outputs.version }}
-
-      - name: Create Github release
-        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
-        with:
-          draft: ${{ contains(needs.package.outputs.version, 'dev') }}
-          name: ${{ needs.package.outputs.version }}
-          tag_name: v${{ needs.package.outputs.version }}
-          files: |
-            /tmp/plugin-package/*.zip
-          fail_on_unmatched_files: true
-          body: ${{ steps.parse.outputs.changelog }}
