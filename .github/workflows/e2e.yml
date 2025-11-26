@@ -16,6 +16,9 @@ jobs:
     env:
       GRAFANA_VERSION: ${{ matrix.grafana_version }}
     steps:
+      - name: Display all outputs as JSON
+        run: |
+          echo "${{ toJSON(github) }}"
       - name: Checkout code
         uses: actions/checkout@v4
         with:
