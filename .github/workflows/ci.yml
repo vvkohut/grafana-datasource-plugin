@@ -11,54 +11,46 @@ on:
         default: false
         type: boolean
 
-env:
-  NODE_VERSION: '22'
-  GO_VERSION: '1.24.4'
-  KUBERNETES_CPU_LIMIT: '12'
-  KUBERNETES_CPU_REQUEST: '12'
-  KUBERNETES_MEMORY_REQUEST: '16Gi'
-  KUBERNETES_MEMORY_LIMIT: '16Gi'
-
 jobs:
   prepare-frontend:
     name: Prepare Frontend
     uses: ./.github/workflows/prepare-frontend.yml
     with:
-      node_version: ${{ env.NODE_VERSION }}
+      node_version: '22'
 
   build-frontend:
     name: Build Frontend
     uses: ./.github/workflows/build-frontend.yml
     needs: prepare-frontend
     with:
-      node_version: ${{ env.NODE_VERSION }}
+      node_version: '22'
 
   test-frontend:
     name: Test Frontend
     uses: ./.github/workflows/test-frontend.yml
     needs: prepare-frontend
     with:
-      node_version: ${{ env.NODE_VERSION }}
+      node_version: '22'
 
   build-backend:
     name: Build Backend
     uses: ./.github/workflows/build-backend.yml
     with:
-      go_version: ${{ env.GO_VERSION }}
+      go_version: '1.24.4'
 
   test-backend:
     name: Test Backend
     uses: ./.github/workflows/test-backend.yml
     if: false
     with:
-      go_version: ${{ env.GO_VERSION }}
+      go_version: '1.24.4'
 
   package:
     name: Package Plugin
     uses: ./.github/workflows/package.yml
     needs: [build-frontend, build-backend]
     with:
-      node_version: ${{ env.NODE_VERSION }}
+      node_version: '22'
     secrets:
       grafana_token: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
 
