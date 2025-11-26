@@ -24,12 +24,9 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
 
-      - name: Download artifact
-        id: download-artifact
-        uses: dawidd6/action-download-artifact@v11
+      - name: Download GitHub artifact
+        uses: actions/download-artifact@v4
         with:
-          workflow: ci.yml
-          commit: ${{ github.event.pull_request.head.sha }}
           name: plugin-package
 
       - name: Extract and prepare plugin
