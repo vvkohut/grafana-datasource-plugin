@@ -34,8 +34,6 @@ jobs:
           gotestsum --junitfile junit_report.xml --format testname -- \
             -race -coverprofile=coverage.txt -covermode atomic \
             $(go list ./... | grep -v /testhelpers)
-        env:
-          CLICKHOUSE_HOSTNAME: localhost
 
       - name: Generate coverage report
         run: |
