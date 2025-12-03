@@ -1,4 +1,12 @@
 # Changelog
+## 0.9.1
+
+- **Fix**: Hot Fix without Jira ticket
+
+## 0.9.0
+
+- **Feature**: Grafana Query Assistant v2 ([GRAP-88](https://hydrolix.atlassian.net/browse/GRAP-88))
+
 ## 0.8.0
 
 - **Feature**: Grafana Query Assistant v1 (GRAP-88)
