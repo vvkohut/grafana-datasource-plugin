@@ -31,6 +31,8 @@ jobs:
         with:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
+
 
       - name: Download frontend artifacts
         uses: actions/download-artifact@v4
