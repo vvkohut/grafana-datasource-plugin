@@ -28,7 +28,7 @@ jobs:
           path: |
             node_modules/
             package-lock.json
-          key: npm-${{ github.ref_name }}-${{ hashFiles('package-lock.json') }}
+          key: npm-${{ github.sha }}
 
       - name: Install dependencies
         run: npm ci
