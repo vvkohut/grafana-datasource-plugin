@@ -47,5 +47,8 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache/save@v4
         with:
-          path: ~/.npm/
+          path: |
+            ~/.npm/
+            node_modules/
+            package-lock.json
           key: npm-${{ github.sha }}
