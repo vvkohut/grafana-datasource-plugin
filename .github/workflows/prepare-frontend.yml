@@ -44,11 +44,11 @@ jobs:
         run: |
           ls -l
 
-      - name: Cache node_modules
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ~/.npm/
-            node_modules/
-            package-lock.json
-          key: npm-${{ github.sha }}
+#      - name: Cache node_modules
+#        uses: actions/cache/save@v4
+#        with:
+#          path: |
+#            ~/.npm/
+#            node_modules/
+#            package-lock.json
+#          key: npm-${{ github.sha }}

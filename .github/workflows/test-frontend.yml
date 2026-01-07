@@ -22,14 +22,14 @@ jobs:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
 
-      - name: Restore node_modules cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.npm/
-            node_modules/
-            package-lock.json
-          key: npm-${{ github.sha }}
+#      - name: Restore node_modules cache
+#        uses: actions/cache/restore@v4
+#        with:
+#          path: |
+#            ~/.npm/
+#            node_modules/
+#            package-lock.json
+#          key: npm-${{ github.sha }}
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit --fund=false
