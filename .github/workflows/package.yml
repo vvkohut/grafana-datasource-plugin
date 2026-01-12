@@ -47,10 +47,10 @@ jobs:
       - name: Set version
         run: ./.github/scripts/set-version.sh
 
-      - name: Sign plugin
-        run: npx --yes @grafana/sign-plugin@latest
-        env:
-          GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.grafana_token }}
+#      - name: Sign plugin
+#        run: npx --yes @grafana/sign-plugin@latest
+#        env:
+#          GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.grafana_token }}
 
       - name: Create package
         id: create
