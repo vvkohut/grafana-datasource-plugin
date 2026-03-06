@@ -45,7 +45,6 @@ jobs:
             console.log('context.repo.owner:', context.repo.owner)
             console.log('context.repo.repo:', context.repo.repo)
             console.log('context.sha:', context.sha)
-            console.log('ref:', `refs/tags/v${PLUGIN_VERSION}`)
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
