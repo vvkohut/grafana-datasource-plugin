@@ -44,15 +44,19 @@ jobs:
             console.log('PLUGIN_VERSION:', PLUGIN_VERSION)
             console.log('context.repo.owner:', context.repo.owner)
             console.log('context.repo.repo:', context.repo.repo)
+            const sha = process.env.PR_HEAD_SHA || context.sha
             console.log('context.sha:', context.sha)
+            console.log('PR_HEAD_SHA:', process.env.PR_HEAD_SHA)
+            console.log('using sha:', sha)
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: `refs/tags/v${PLUGIN_VERSION}`,
-              sha: context.sha
+              sha: sha
             })
         env:
           PLUGIN_VERSION: ${{ inputs.version }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
 
       - name: Create Github release
         uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
