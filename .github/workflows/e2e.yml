@@ -1,33 +1,26 @@
 name: E2E Tests
 
 on:
-  workflow_run:
-    workflows: ["CI Pipeline"]
-    types: [completed]
+  workflow_call:
+
 
 jobs:
   e2e-test:
     name: E2E Test - Grafana ${{ matrix.grafana_version }}
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
     strategy:
       matrix:
         grafana_name: ["grafana-enterprise"]
-        grafana_version: ["10.4.18", "11.6.1"]
+        grafana_version: ["10.4.18", "11.6.1", "12.0.2"]
     env:
       GRAFANA_VERSION: ${{ matrix.grafana_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
 
-      - name: Download artifact
-        id: download-artifact
-        uses: dawidd6/action-download-artifact@v11
+      - name: Download GitHub artifact
+        uses: actions/download-artifact@v4
         with:
-          workflow: ci.yml
-          commit: ${{ github.event.pull_request.head.sha }}
           name: plugin-package
 
       - name: Extract and prepare plugin
@@ -42,7 +35,7 @@ jobs:
 
       - name: Install Playwright
         run: |
-          npm install
+          npm ci --prefer-offline --no-audit --fund=false
           npx playwright install
 
       - name: Wait for Grafana
