@@ -45,6 +45,7 @@ jobs:
             console.log('context.repo.owner:', context.repo.owner)
             console.log('context.repo.repo:', context.repo.repo)
             const sha = process.env.PR_HEAD_SHA || context.sha
+            
             console.log('context.sha:', context.sha)
             console.log('PR_HEAD_SHA:', process.env.PR_HEAD_SHA)
             console.log('using sha:', sha)
