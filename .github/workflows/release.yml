@@ -41,10 +41,11 @@ jobs:
         with:
           script: |
             const { PLUGIN_VERSION } = process.env
-            echo PLUGIN_VERSION
-            echo $process.env.GITHUB_SHA
-            echo $process.env.GITHUB_REF
-            echo $process.env.GITHUB_REPOSITORY
+            console.log('PLUGIN_VERSION:', PLUGIN_VERSION)
+            console.log('context.repo.owner:', context.repo.owner)
+            console.log('context.repo.repo:', context.repo.repo)
+            console.log('context.sha:', context.sha)
+            console.log('ref:', `refs/tags/v${PLUGIN_VERSION}`)
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
