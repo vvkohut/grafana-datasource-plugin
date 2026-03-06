@@ -41,7 +41,9 @@ jobs:
         with:
           script: |
             const { PLUGIN_VERSION } = process.env
-            echo context
+            echo process.env.GITHUB_SHA
+            echo process.env.GITHUB_REF
+            echo process.env.GITHUB_REPOSITORY
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
