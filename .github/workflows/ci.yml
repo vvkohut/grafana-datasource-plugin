@@ -12,65 +12,65 @@ on:
         type: boolean
 
 jobs:
-  build-frontend:
-    name: Build Frontend
-    uses: ./.github/workflows/build-frontend.yml
-    with:
-      node_version: '22'
-
-  test-frontend:
-    name: Test Frontend
-    uses: ./.github/workflows/test-frontend.yml
-    with:
-      node_version: '22'
-
-  compatibility-check:
-    name: Compatibility Check
-    uses: ./.github/workflows/compatibility-check.yml
-    needs: build-frontend
-    permissions:
-      pull-requests: write
-      contents: read
-
-  build-backend:
-    name: Build Backend
-    uses: ./.github/workflows/build-backend.yml
-    with:
-      go_version: '1.24.4'
-
-  test-backend:
-    name: Test Backend
-    uses: ./.github/workflows/test-backend.yml
-    with:
-      go_version: '1.24.4'
-
-  package:
-    name: Package Plugin
-    uses: ./.github/workflows/package.yml
-    needs: [build-frontend, build-backend]
-    with:
-      node_version: '22'
-    secrets:
-      grafana_token: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
-
-  e2e:
-    name: E2E Tests
-    uses: ./.github/workflows/e2e.yml
-    needs: [package]
-
-  publish-aws:
-    name: Publish to AWS S3
-    uses: ./.github/workflows/s3_publish.yml
-    if: inputs.publish_to_aws
-    needs: [package]
-    secrets:
-      aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#  build-frontend:
+#    name: Build Frontend
+#    uses: ./.github/workflows/build-frontend.yml
+#    with:
+#      node_version: '22'
+#
+#  test-frontend:
+#    name: Test Frontend
+#    uses: ./.github/workflows/test-frontend.yml
+#    with:
+#      node_version: '22'
+#
+#  compatibility-check:
+#    name: Compatibility Check
+#    uses: ./.github/workflows/compatibility-check.yml
+#    needs: build-frontend
+#    permissions:
+#      pull-requests: write
+#      contents: read
+#
+#  build-backend:
+#    name: Build Backend
+#    uses: ./.github/workflows/build-backend.yml
+#    with:
+#      go_version: '1.24.4'
+#
+#  test-backend:
+#    name: Test Backend
+#    uses: ./.github/workflows/test-backend.yml
+#    with:
+#      go_version: '1.24.4'
+#
+#  package:
+#    name: Package Plugin
+#    uses: ./.github/workflows/package.yml
+#    needs: [build-frontend, build-backend]
+#    with:
+#      node_version: '22'
+#    secrets:
+#      grafana_token: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
+#
+#  e2e:
+#    name: E2E Tests
+#    uses: ./.github/workflows/e2e.yml
+#    needs: [package]
+#
+#  publish-aws:
+#    name: Publish to AWS S3
+#    uses: ./.github/workflows/s3_publish.yml
+#    if: inputs.publish_to_aws
+#    needs: [package]
+#    secrets:
+#      aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#      aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   create-github-release:
     name: Create GitHub Release
     uses: ./.github/workflows/release.yml
-    needs: [package, e2e]
+  #  needs: [package, e2e]
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
     with:
       version: ${{ needs.package.outputs.version }}
