@@ -20,11 +20,11 @@ jobs:
           echo "${{ toJSON(github) }}"
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Download GitHub artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: plugin-package
-          path: /tmp/plugin-package
+#      - name: Download GitHub artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: plugin-package
+#          path: /tmp/plugin-package
       - name: Parse changelog
         id: parse
         run: |
@@ -41,6 +41,7 @@ jobs:
         with:
           script: |
             const { PLUGIN_VERSION } = process.env
+            echo context
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
